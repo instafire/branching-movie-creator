@@ -17,7 +17,6 @@ export interface Project {
   duration_seconds?: number;
   is_published: boolean;
   published_at?: Date;
-  theme_color?: string;
   created_at: Date;
   updated_at: Date;
 }
@@ -56,9 +55,6 @@ export interface Node {
   position_y: number;
   auto_advance_ms?: number;
   is_ending: boolean;
-  mute_audio: boolean;
-  bg_music_url?: string;
-  is_event_clip: boolean;
   created_at: Date;
   updated_at: Date;
 }
@@ -111,7 +107,6 @@ export interface AnalyticsEvent {
 export interface CreateProjectInput {
   title: string;
   description?: string;
-  theme_color?: string;
 }
 
 export interface CreateNodeInput {
@@ -125,9 +120,6 @@ export interface CreateNodeInput {
   position_y?: number;
   auto_advance_ms?: number;
   is_ending?: boolean;
-  mute_audio?: boolean;
-  bg_music_url?: string;
-  is_event_clip?: boolean;
 }
 
 export interface UpdateNodeInput {
@@ -140,9 +132,6 @@ export interface UpdateNodeInput {
   position_y?: number;
   auto_advance_ms?: number;
   is_ending?: boolean;
-  mute_audio?: boolean;
-  bg_music_url?: string;
-  is_event_clip?: boolean;
 }
 
 export interface CreateEdgeInput {

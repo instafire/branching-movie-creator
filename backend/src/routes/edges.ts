@@ -32,10 +32,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
       display_order,
       source_handle,
       target_handle,
-      choice_color,
-      set_variable,
-      require_variable,
-      return_to_source,
     } = req.body;
 
     const project = await queryOne(
@@ -71,10 +67,9 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
       `INSERT INTO edges (
         project_id, source_node_id, target_node_id, choice_label,
         choice_description, trigger_at_ms, hide_at_ms, display_order,
-        source_handle, target_handle, choice_color, set_variable,
-        require_variable, return_to_source
+        source_handle, target_handle
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id`,
       [
         project_id,
@@ -87,10 +82,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
         Number(nextDisplayOrder),
         source_handle || 'right',
         target_handle || 'left',
-        choice_color || '#ffffff',
-        set_variable || null,
-        require_variable || null,
-        return_to_source ?? false,
       ]
     );
 
@@ -136,10 +127,6 @@ router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
       'target_handle',
       'display_order',
       'condition_expression',
-      'choice_color',
-      'set_variable',
-      'require_variable',
-      'return_to_source',
     ];
 
     for (const field of fields) {

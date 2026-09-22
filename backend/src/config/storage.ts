@@ -54,7 +54,7 @@ function toPublicPath(key: string): string {
 }
 
 function getBackendBaseUrl(): string {
-  return (process.env.BACKEND_PUBLIC_URL || `http://localhost:${process.env.PORT || 3001}`).replace(/\/$/, '');
+  return (process.env.BACKEND_PUBLIC_URL || `http://localhost:${process.env.PORT || 3002}`).replace(/\/$/, '');
 }
 
 export function resolveLocalPath(key: string): string {

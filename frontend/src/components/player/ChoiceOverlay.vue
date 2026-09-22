@@ -7,13 +7,12 @@
           v-for="choice in choices"
           :key="choice.id"
           class="choice-button"
-          :class="{ disabled: disabled, locked: isLocked(choice) }"
-          :disabled="disabled || isLocked(choice)"
+          :class="{ disabled: disabled }"
+          :disabled="disabled"
           @mouseenter="startPreview(choice)"
           @mouseleave="stopPreview(choice)"
           @focus="startPreview(choice)"
           @blur="stopPreview(choice)"
-          @touchstart.passive="startPreview(choice)"
           @click="handleSelect(choice)"
         >
           <div class="choice-thumbnail">
@@ -45,12 +44,9 @@
                 <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" fill="currentColor"/>
               </svg>
             </div>
-            <div v-if="isLocked(choice)" class="choice-lock-overlay">
-              <span class="lock-icon">🔒</span>
-            </div>
             <div class="choice-shade" />
             <div class="choice-copy">
-              <span class="choice-label" :style="choiceLabelStyle(choice)">{{ choiceLabel(choice) }}</span>
+              <span class="choice-label">{{ choiceLabel(choice) }}</span>
             </div>
           </div>
         </button>
@@ -63,10 +59,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type ComponentPublicInstance, type CSSProperties } from 'vue'
+import { ref, type ComponentPublicInstance } from 'vue'
 
 import type { Edge, Node } from '../../stores/graphStore'
-import { usePlayerStore } from '../../stores/playerStore'
 
 type ChoiceOverlayChoice = Edge & {
   target_node?: Node
@@ -81,25 +76,11 @@ const emit = defineEmits<{
   (e: 'select', edge: Edge): void
 }>()
 
-const playerStore = usePlayerStore()
 const previewVideos = new Map<string, HTMLVideoElement>()
 const activePreviewId = ref<string | null>(null)
 
 function choiceLabel(choice: ChoiceOverlayChoice) {
   return choice.choice_label || choice.target_node?.label || 'Continue'
-}
-
-function choiceLabelStyle(choice: ChoiceOverlayChoice): CSSProperties {
-  const color = choice.choice_color
-  if (!color || color === '#ffffff') return {}
-  return {
-    color,
-    textShadow: `0 0 8px ${color}99, 0 2px 10px rgba(0, 0, 0, 0.55)`,
-  }
-}
-
-function isLocked(choice: ChoiceOverlayChoice): boolean {
-  return playerStore.isChoiceLocked(choice)
 }
 
 function setPreviewVideo(id: string, element: Element | ComponentPublicInstance | null) {
@@ -162,7 +143,7 @@ function stopPreview(choice: ChoiceOverlayChoice) {
 }
 
 function handleSelect(edge: ChoiceOverlayChoice) {
-  if (!props.disabled && !isLocked(edge)) {
+  if (!props.disabled) {
     emit('select', edge)
   }
 }
@@ -176,7 +157,6 @@ function handleSelect(edge: ChoiceOverlayChoice) {
   align-items: center;
   justify-content: center;
   z-index: 10;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .dimmer {
@@ -209,8 +189,6 @@ function handleSelect(edge: ChoiceOverlayChoice) {
   color: white;
   cursor: pointer;
   text-align: center;
-  touch-action: manipulation;
-  -webkit-tap-highlight-color: transparent;
   transition: transform 0.25s ease, filter 0.25s ease;
 }
 
@@ -220,37 +198,16 @@ function handleSelect(edge: ChoiceOverlayChoice) {
 }
 
 .choice-button:active:not(.disabled) {
-  transform: scale(0.96);
+  transform: translateY(-1px);
 }
 
 .choice-button:focus-visible {
   outline: none;
 }
 
-.choice-button.disabled,
-.choice-button.locked {
+.choice-button.disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.choice-button.locked {
-  filter: grayscale(0.8);
-}
-
-.choice-lock-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(2px);
-}
-
-.lock-icon {
-  font-size: 2rem;
-  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
 }
 
 .choice-thumbnail {
@@ -368,48 +325,25 @@ function handleSelect(edge: ChoiceOverlayChoice) {
 }
 
 @media (max-width: 640px) {
-  .choice-overlay {
-    align-items: flex-end;
-  }
-
   .choice-panel {
-    width: 100%;
-    padding: 16px 12px calc(env(safe-area-inset-bottom, 12px) + 16px);
-    background: linear-gradient(transparent, rgba(2, 6, 23, 0.85) 20%);
+    width: calc(100% - 24px);
+    padding: 18px;
   }
 
   .choices-container {
-    gap: 10px;
-    justify-content: center;
+    gap: 12px;
   }
 
   .choice-button {
-    width: min(44vw, 160px);
+    width: min(32vw, 126px);
   }
 
   .choice-thumbnail {
     border-radius: 16px;
-    aspect-ratio: 4 / 3;
   }
 
   .choice-label {
-    font-size: 0.72rem;
-  }
-
-  .choice-copy {
-    bottom: 6px;
-    left: 6px;
-    right: 6px;
-  }
-}
-
-@media (max-width: 380px) {
-  .choice-button {
-    width: min(42vw, 140px);
-  }
-
-  .choice-label {
-    font-size: 0.65rem;
+    font-size: 0.58rem;
   }
 }
 </style>

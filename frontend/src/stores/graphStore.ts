@@ -32,9 +32,6 @@ export interface Node {
   position_y: number;
   auto_advance_ms?: number | null;
   is_ending: boolean;
-  mute_audio: boolean;
-  bg_music_url?: string | null;
-  is_event_clip: boolean;
   media_clip?: MediaClip | null;
 }
 
@@ -51,10 +48,6 @@ export interface Edge {
   target_handle?: 'left' | 'right' | 'top' | 'bottom';
   display_order: number;
   target_node?: Node;
-  choice_color?: string;
-  set_variable?: string | null;
-  require_variable?: string | null;
-  return_to_source?: boolean;
 }
 
 interface GraphResponse {

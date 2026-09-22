@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { query, queryOne } from '../config/database.js';
-import { generateToken } from '../middleware/auth.js';
+import { generateToken, authMiddleware, type AuthRequest } from '../middleware/auth.js';
 import { AppError } from '../middleware/errorHandler.js';
 
 const router = Router();
@@ -95,25 +95,15 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
 });
 
 // Get current user
-router.get('/me', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/me', authMiddleware, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new AppError(401, 'No token provided');
-    }
-
-    const token = authHeader.substring(7);
-    const jwt = await import('jsonwebtoken');
-    const decoded = jwt.default.verify(token, process.env.JWT_SECRET || 'dev-secret-change-in-production') as { userId: string };
-
     const user = await queryOne(
       'SELECT id, email, username, avatar_url, created_at FROM users WHERE id = $1',
-      [decoded.userId]
+      [req.user!.id]
     );
 
     if (!user) {
-      throw new AppError(401, 'User not found');
+      throw new AppError(404, 'User not found');
     }
 
     res.json(user);

@@ -1,13 +1,14 @@
 {
-  "name": "branching-movie-creator",
-  "version": "1.0.0",
-  "description": "Interactive branching-narrative movie creator using Apple Live Photos",
+  "name": "im-server",
+  "version": "2.0.0",
+  "description": "IM server for interactive branching movies",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
+    "test": "tsc --noEmit",
     "db:migrate": "tsx src/scripts/migrate.ts"
   },
   "dependencies": {
@@ -20,7 +21,6 @@
     "multer": "^1.4.5-lts.1",
     "@aws-sdk/client-s3": "^3.478.0",
     "@aws-sdk/lib-storage": "^3.478.0",
-    "bullmq": "^5.1.0",
     "fluent-ffmpeg": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "bcryptjs": "^2.4.3",

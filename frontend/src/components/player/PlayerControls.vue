@@ -1,11 +1,6 @@
 <template>
   <div class="player-controls">
-    <div
-      class="progress-container"
-      @click="handleSeek"
-      @touchstart.prevent="handleTouchSeek"
-      @touchmove.prevent="handleTouchSeek"
-    >
+    <div class="progress-container" @click="handleSeek">
       <div class="progress-track">
         <div class="progress-fill" :style="{ width: `${progressPercent}%` }" />
         <div
@@ -89,19 +84,6 @@ function handleSeek(event: MouseEvent) {
   const target = event.currentTarget as HTMLDivElement
   const rect = target.getBoundingClientRect()
   const percent = Math.min(Math.max((event.clientX - rect.left) / rect.width, 0), 1)
-  emit('seek', percent * props.duration)
-}
-
-function handleTouchSeek(event: TouchEvent) {
-  const target = event.currentTarget as HTMLDivElement
-  const rect = target.getBoundingClientRect()
-  const touch = event.touches[0]
-
-  if (!touch) {
-    return
-  }
-
-  const percent = Math.min(Math.max((touch.clientX - rect.left) / rect.width, 0), 1)
   emit('seek', percent * props.duration)
 }
 
@@ -197,34 +179,5 @@ function formatTime(ms: number): string {
 .separator {
   margin: 0 4px;
   opacity: 0.55;
-}
-
-@media (max-width: 640px) {
-  .player-controls {
-    padding: 14px 12px calc(env(safe-area-inset-bottom, 8px) + 10px);
-  }
-
-  .control-button {
-    width: 44px;
-    height: 44px;
-    min-width: 44px;
-  }
-
-  .progress-container {
-    padding: 12px 0;
-  }
-
-  .progress-track {
-    height: 8px;
-  }
-
-  .controls-row {
-    gap: 12px;
-    margin-top: 8px;
-  }
-
-  .time-display {
-    font-size: 13px;
-  }
 }
 </style>

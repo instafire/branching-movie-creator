@@ -3,34 +3,19 @@
     <header v-if="showWorkspaceChrome" class="app-header">
       <nav>
         <router-link to="/projects" class="logo">
-          <span class="logo-mark">BM</span>
-          <span>BranchMovie</span>
+          <span class="logo-mark">IM</span>
+          <span>IM</span>
         </router-link>
 
         <div class="nav-links">
           <router-link to="/projects">Projects</router-link>
-          <router-link to="/feed">Feed</router-link>
-          <div class="user-menu">
-            <button class="user-avatar" @click="showUserDropdown = !showUserDropdown">
-              {{ userInitials }}
-            </button>
-            <Transition name="dropdown">
-              <div v-if="showUserDropdown" class="user-dropdown" @click="showUserDropdown = false">
-                <span class="dropdown-email">{{ userEmail }}</span>
-                <button class="dropdown-item" @click="logout">Logout</button>
-              </div>
-            </Transition>
-          </div>
+          <button class="logout-btn" @click="logout">Logout</button>
         </div>
       </nav>
     </header>
 
     <main class="app-main" :class="{ 'app-main-feed': isFeedLayout }">
-      <router-view v-slot="{ Component }">
-        <Transition name="page" mode="out-in">
-          <component :is="Component" />
-        </Transition>
-      </router-view>
+      <router-view />
     </main>
 
     <ToastContainer />
@@ -38,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import ToastContainer from './components/ToastContainer.vue'
@@ -48,15 +33,9 @@ const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
 
-const showUserDropdown = ref(false)
 const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isFeedLayout = computed(() => route.meta.layout === 'feed')
 const showWorkspaceChrome = computed(() => isAuthenticated.value && !isFeedLayout.value)
-const userEmail = computed(() => authStore.user?.email || '')
-const userInitials = computed(() => {
-  const name = authStore.user?.username || authStore.user?.email || '?'
-  return name.slice(0, 2).toUpperCase()
-})
 
 function logout() {
   authStore.logout()
@@ -237,111 +216,35 @@ select {
 }
 
 .nav-links a {
-  position: relative;
   color: var(--text-muted);
   text-decoration: none;
   transition: color 0.2s ease;
-  padding-bottom: 4px;
 }
 
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
-  height: 2px;
-  background: var(--brand);
-  border-radius: 999px;
-  transform: scaleX(0);
-  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.nav-links a:hover {
-  color: var(--text);
-}
-
+.nav-links a:hover,
 .nav-links a.router-link-active {
   color: var(--text);
 }
 
-.nav-links a.router-link-active::after {
-  transform: scaleX(1);
-}
-
-.user-menu {
-  position: relative;
-}
-
-.user-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, var(--brand), var(--brand-strong));
-  color: #00111a;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.user-avatar:hover {
-  transform: scale(1.08);
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
-}
-
-.user-dropdown {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  min-width: 180px;
-  background: rgba(15, 23, 42, 0.96);
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  border-radius: 14px;
-  padding: 8px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(18px);
-  z-index: 200;
-}
-
-.dropdown-email {
-  display: block;
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--text-muted);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-  margin-bottom: 4px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dropdown-item {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 8px 12px;
-  border: none;
+.logout-btn {
   background: transparent;
-  color: var(--text);
-  font-size: 13px;
-  border-radius: 8px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: var(--text-muted);
+  padding: 8px 14px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 0.15s ease;
 }
 
-.dropdown-item:hover {
-  background: rgba(148, 163, 184, 0.1);
+.logout-btn:hover {
+  color: var(--text);
+  background: rgba(148, 163, 184, 0.08);
 }
 
 .app-main {
   flex: 1;
   width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
   padding: 24px;
 }
 
@@ -451,30 +354,6 @@ label {
   .nav-links {
     gap: 14px;
   }
-}
-
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.page-enter-from,
-.page-leave-to {
-  opacity: 0;
-}
-
-.dropdown-enter-active {
-  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.dropdown-leave-active {
-  transition: all 0.15s ease-in;
-}
-
-.dropdown-enter-from,
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-6px) scale(0.95);
 }
 
 @media (prefers-reduced-motion: reduce) {

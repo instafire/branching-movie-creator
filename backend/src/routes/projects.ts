@@ -102,7 +102,7 @@ router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
     const values: any[] = [];
     let paramCount = 1;
 
-    for (const field of ['title', 'description', 'thumbnail_url', 'is_published', 'theme_color'] as const) {
+    for (const field of ['title', 'description', 'thumbnail_url', 'is_published'] as const) {
       if (req.body[field] !== undefined) {
         updates.push(`${field} = $${paramCount++}`);
         values.push(req.body[field]);

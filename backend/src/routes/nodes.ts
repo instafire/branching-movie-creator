@@ -69,9 +69,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
       position_y,
       auto_advance_ms,
       is_ending,
-      mute_audio,
-      bg_music_url,
-      is_event_clip,
     } = req.body;
 
     const project = await queryOne(
@@ -92,10 +89,9 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
     const result = await query<{ id: string }>(
       `INSERT INTO nodes (
         project_id, media_clip_id, label, node_type, start_time_ms, end_time_ms,
-        position_x, position_y, auto_advance_ms, is_ending,
-        mute_audio, bg_music_url, is_event_clip
+        position_x, position_y, auto_advance_ms, is_ending
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id`,
       [
         project_id,
@@ -108,9 +104,6 @@ router.post('/', async (req: AuthRequest, res: Response, next: NextFunction) => 
         Math.round(position_y || 0),
         normalizeNullableNumber(auto_advance_ms),
         Boolean(is_ending),
-        Boolean(mute_audio),
-        bg_music_url || null,
-        Boolean(is_event_clip),
       ]
     );
 
@@ -177,9 +170,6 @@ router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
       'position_y',
       'auto_advance_ms',
       'is_ending',
-      'mute_audio',
-      'bg_music_url',
-      'is_event_clip',
     ];
 
     for (const field of fields) {
@@ -197,10 +187,6 @@ router.put('/:id', async (req: AuthRequest, res: Response, next: NextFunction) =
 
         if (field === 'end_time_ms' || field === 'auto_advance_ms') {
           value = normalizeNullableNumber(req.body[field]);
-        }
-        
-        if (field === 'mute_audio' || field === 'is_ending' || field === 'is_event_clip') {
-          value = Boolean(req.body[field]);
         }
 
         values.push(value);

@@ -11,7 +11,6 @@ export interface Project {
   created_at: string
   updated_at: string
   node_count?: number
-  theme_color?: string
 }
 
 export interface ProjectGraph extends Project {

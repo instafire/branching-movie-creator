@@ -26,11 +26,22 @@ export function errorHandler(
     });
   }
 
+  // JWT authentication errors
+  if (
+    err.name === 'JsonWebTokenError' ||
+    err.name === 'TokenExpiredError' ||
+    err.name === 'NotBeforeError'
+  ) {
+    return res.status(401).json({
+      error: 'Invalid or expired token',
+    });
+  }
+
   // Zod validation errors
   if (err.name === 'ZodError') {
     return res.status(400).json({
       error: 'Validation error',
-      details: err,
+      details: (err as any).issues || (err as any).errors || err.message,
     });
   }
 

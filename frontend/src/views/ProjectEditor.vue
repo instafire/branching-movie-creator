@@ -16,15 +16,7 @@
             @blur="saveTitle"
             @keyup.enter="saveTitle"
           />
-          <div class="project-subtitle-row">
-            <p class="project-hint">Build the path users will see and branch through.</p>
-            <span v-if="saveStatus" class="save-badge" :class="saveStatus">
-              {{ saveStatus === 'saving' ? 'Saving…' : 'Saved ✓' }}
-            </span>
-            <span class="publish-status-badge" :class="isPublished ? 'published' : 'draft'">
-              {{ isPublished ? 'Published' : 'Draft' }}
-            </span>
-          </div>
+          <p class="project-hint">Build the path users will see and branch through.</p>
         </div>
       </div>
 
@@ -70,28 +62,6 @@
           </button>
           <button class="btn btn-primary btn-compact" @click="handlePreview">
             Preview
-          </button>
-          <router-link
-            v-if="isPublished"
-            :to="`/movies/${projectId}`"
-            class="btn btn-secondary btn-compact"
-            target="_blank"
-          >
-            View on Feed
-          </router-link>
-          <router-link
-            :to="`/projects/${projectId}/analytics`"
-            class="btn btn-secondary btn-compact"
-          >
-            Analytics
-          </router-link>
-          <button
-            class="btn btn-compact"
-            :class="isPublished ? 'btn-danger' : 'btn-publish'"
-            :disabled="isPublishing"
-            @click="handlePublishToggle"
-          >
-            {{ isPublishing ? 'Saving…' : (isPublished ? 'Unpublish' : 'Publish') }}
           </button>
         </div>
       </div>
@@ -199,31 +169,6 @@
             </label>
           </div>
 
-          <div class="form-group checkbox">
-            <label>
-              <input v-model="selectedNode.mute_audio" type="checkbox" @change="saveNode" />
-              Mute original audio
-            </label>
-          </div>
-
-          <div class="form-group checkbox">
-            <label>
-              <input v-model="selectedNode.is_event_clip" type="checkbox" @change="saveNode" />
-              Event clip (loop & return)
-            </label>
-            <span class="form-hint" style="display:block;margin-top:4px;">Returns viewer to start after playing without returning to main flow.</span>
-          </div>
-
-          <div class="form-group">
-            <label for="node-bgm">Background Music URL</label>
-            <input
-              id="node-bgm"
-              v-model="selectedNode.bg_music_url"
-              placeholder="/audio/music.mp3 or valid URL"
-              @change="saveNode"
-            />
-          </div>
-
           <button class="btn btn-danger full-width" @click="handleDeleteNode">
             Delete Node
           </button>
@@ -292,82 +237,13 @@
             </div>
           </div>
 
-          <div class="form-group">
-            <label for="edge-color">Text Color</label>
-            <div class="color-picker-row">
-              <input
-                id="edge-color"
-                v-model="selectedEdge.choice_color"
-                type="color"
-                class="color-input"
-                @change="saveEdge"
-              />
-              <span class="color-preview" :style="{ color: selectedEdge.choice_color || '#ffffff' }">
-                {{ selectedEdge.choice_color || '#ffffff' }}
-              </span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input
-                type="checkbox"
-                v-model="selectedEdge.return_to_source"
-                @change="saveEdge"
-              />
-              Return after playing
-            </label>
-            <span class="form-hint">Viewer returns to this node after watching the target</span>
-          </div>
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label for="edge-set-var">Set Variable</label>
-              <input
-                id="edge-set-var"
-                v-model="selectedEdge.set_variable"
-                placeholder="e.g. has_key"
-                @change="saveEdge"
-              />
-            </div>
-
-            <div class="form-group">
-              <label for="edge-req-var">Require Variable</label>
-              <input
-                id="edge-req-var"
-                v-model="selectedEdge.require_variable"
-                placeholder="e.g. has_key"
-                @change="saveEdge"
-              />
-            </div>
-          </div>
-
           <button class="btn btn-danger full-width" @click="handleDeleteEdge">
             Delete Choice
           </button>
         </section>
 
         <section v-if="!selectedNode && !selectedEdge" class="sidebar-section helper-card">
-          <div class="section-header">
-            <h3>Project Settings</h3>
-          </div>
-          <div class="form-group">
-            <label for="project-theme">Theme Color</label>
-            <div class="color-picker-row">
-              <input
-                id="project-theme"
-                v-model="projectThemeColor"
-                type="color"
-                class="color-input"
-                @change="saveProjectTheme"
-              />
-              <span class="color-preview" :style="{ color: projectThemeColor || '#3b82f6' }">
-                {{ projectThemeColor || '#3b82f6' }}
-              </span>
-            </div>
-          </div>
-          
-          <h3 style="margin-top:24px;">Story Builder</h3>
+          <h3>Story Builder</h3>
           <p>Select a node or edge to edit it. Use the graph tools to move nodes, pan, zoom, duplicate beats, and test branches faster.</p>
         </section>
       </aside>
@@ -479,23 +355,10 @@
 
     <div v-if="showUploadModal" class="modal-overlay" @click.self="closeUploadModal">
       <div class="modal">
-        <div class="modal-header">
-          <h2>Upload Live Photo Video</h2>
-          <button class="modal-close" type="button" @click="closeUploadModal">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
-          </button>
-        </div>
+        <h2>Upload Live Photo Video</h2>
         <p class="modal-copy">Use the MOV clip from an iPhone Live Photo, or upload a regular MP4 clip.</p>
 
-        <button
-          class="upload-area"
-          :class="{ 'drag-over': isDragOver }"
-          type="button"
-          @click="triggerFileInput"
-          @dragover.prevent="isDragOver = true"
-          @dragleave.prevent="isDragOver = false"
-          @drop.prevent="handleDrop"
-        >
+        <button class="upload-area" type="button" @click="triggerFileInput">
           <input
             ref="fileInput"
             type="file"
@@ -506,7 +369,7 @@
           <svg viewBox="0 0 24 24" width="48" height="48">
             <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" fill="currentColor"/>
           </svg>
-          <strong>{{ isDragOver ? 'Drop file here' : 'Choose a file' }}</strong>
+          <strong>Choose a file</strong>
           <span>MOV from Live Photos works best. MP4 is also supported.</span>
         </button>
 
@@ -526,12 +389,7 @@
 
     <div v-if="showThumbnailModal && thumbnailClip" class="modal-overlay" @click.self="closeThumbnailModal">
       <div class="modal thumbnail-modal">
-        <div class="modal-header">
-          <h2>Create Thumbnail</h2>
-          <button class="modal-close" type="button" @click="closeThumbnailModal">
-            <svg viewBox="0 0 24 24" width="20" height="20"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
-          </button>
-        </div>
+        <h2>Create Thumbnail</h2>
         <p class="modal-copy">
           Scrub to the frame you want to use, then save it as the clip thumbnail and optionally the published cover.
         </p>
@@ -600,14 +458,12 @@ import { useRoute, useRouter } from 'vue-router'
 import NodeCanvas from '../components/editor/NodeCanvas.vue'
 import { mediaApi } from '../api/client'
 import { useGraphStore, type Edge, type MediaClip, type Node } from '../stores/graphStore'
-import { useToastStore } from '../stores/toastStore'
 import { useProjectStore } from '../stores/projectStore'
 
 const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
 const graphStore = useGraphStore()
-const toastStore = useToastStore()
 type NodeCanvasExposed = {
   revealNode: (nodeId: string) => Promise<void> | void
   revealEdge: (edgeId: string) => Promise<void> | void
@@ -617,7 +473,6 @@ type NodeCanvasExposed = {
 
 const projectId = route.params.id as string
 const projectTitle = ref('')
-const projectThemeColor = ref('#3b82f6')
 const canvasRef = ref<NodeCanvasExposed | null>(null)
 const showUploadModal = ref(false)
 const showThumbnailModal = ref(false)
@@ -628,15 +483,12 @@ const isUploading = ref(false)
 const isSavingThumbnail = ref(false)
 const uploadError = ref('')
 const thumbnailError = ref('')
-const isDragOver = ref(false)
-const saveStatus = ref<'saving' | 'saved' | ''>('')
 const fileInput = ref<HTMLInputElement | null>(null)
 const thumbnailVideoElement = ref<HTMLVideoElement | null>(null)
 const thumbnailClipId = ref('')
 const thumbnailTimeMs = ref(0)
 const thumbnailDurationMs = ref(0)
 const setAsProjectThumbnail = ref(true)
-const isPublishing = ref(false)
 
 const selectedNode = computed(() => graphStore.selectedNode)
 const selectedEdge = computed(() => graphStore.selectedEdge)
@@ -644,7 +496,6 @@ const nodes = computed(() => graphStore.nodes)
 const edges = computed(() => graphStore.edges)
 const mediaClips = computed(() => graphStore.mediaClips)
 const currentProjectThumbnailUrl = computed(() => projectStore.currentProject?.thumbnail_url || '')
-const isPublished = computed(() => Boolean(projectStore.currentProject?.is_published))
 const thumbnailClip = computed(() =>
   mediaClips.value.find((clip) => clip.id === thumbnailClipId.value) || null
 )
@@ -915,64 +766,18 @@ function handleEdgeSelect(edgeId: string | null) {
   graphStore.selectEdge(edgeId)
 }
 
-async function saveProjectTheme() {
-  if (!projectStore.currentProject) return
-  saveStatus.value = 'saving'
-  const updated = await projectStore.updateProject(projectId, {
-    theme_color: projectThemeColor.value
-  })
-
-  if (updated) {
-    saveStatus.value = 'saved'
-    setTimeout(() => { saveStatus.value = '' }, 2000)
-  } else {
-    saveStatus.value = ''
-    toastStore.error('Failed to save project theme')
-  }
-}
-
 async function saveTitle() {
   const trimmedTitle = projectTitle.value.trim()
 
   if (trimmedTitle) {
     projectTitle.value = trimmedTitle
-    saveStatus.value = 'saving'
     await projectStore.updateProject(projectId, { title: trimmedTitle })
-    showSaved()
   }
-}
-
-async function handlePublishToggle() {
-  isPublishing.value = true
-
-  try {
-    if (isPublished.value) {
-      await projectStore.unpublishProject(projectId)
-      toastStore.info('Project unpublished')
-    } else {
-      const result = await projectStore.publishProject(projectId)
-
-      if (!result) {
-        toastStore.error(projectStore.error || 'Failed to publish')
-        return
-      }
-
-      toastStore.success('Project published!')
-    }
-  } finally {
-    isPublishing.value = false
-  }
-}
-
-function showSaved() {
-  saveStatus.value = 'saved'
-  setTimeout(() => { saveStatus.value = '' }, 2000)
 }
 
 async function saveNode() {
   if (selectedNode.value) {
     const nodeId = selectedNode.value.id
-    saveStatus.value = 'saving'
     await graphStore.updateNode(selectedNode.value.id, {
       ...selectedNode.value,
       media_clip_id: selectedNode.value.media_clip_id || null,
@@ -981,15 +786,12 @@ async function saveNode() {
     })
     await graphStore.loadGraph(projectId)
     graphStore.selectNode(nodeId)
-    showSaved()
   }
 }
 
 async function saveEdge() {
   if (selectedEdge.value) {
-    saveStatus.value = 'saving'
     await graphStore.updateEdge(selectedEdge.value.id, selectedEdge.value)
-    showSaved()
   }
 }
 
@@ -1082,15 +884,6 @@ function handleFileSelect(event: Event) {
   selectedFile.value = target.files?.[0] || null
 }
 
-function handleDrop(event: DragEvent) {
-  isDragOver.value = false
-  const file = event.dataTransfer?.files[0]
-
-  if (file) {
-    selectedFile.value = file
-  }
-}
-
 async function handleUploadFile() {
   if (!selectedFile.value) {
     return
@@ -1103,7 +896,6 @@ async function handleUploadFile() {
     await mediaApi.upload(selectedFile.value, projectId)
     await graphStore.loadGraph(projectId)
     closeUploadModal()
-    toastStore.success('Media uploaded successfully')
   } catch (error: any) {
     uploadError.value = error.response?.data?.error || 'Upload failed'
   } finally {
@@ -1260,35 +1052,6 @@ function toTimelinePx(timeMs: number): number {
   margin-top: 2px;
 }
 
-.project-subtitle-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.save-badge {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 999px;
-  animation: fadeInBadge 0.2s ease;
-}
-
-.save-badge.saving {
-  color: #fcd34d;
-  background: rgba(252, 211, 77, 0.12);
-}
-
-.save-badge.saved {
-  color: #4ade80;
-  background: rgba(74, 222, 128, 0.12);
-}
-
-@keyframes fadeInBadge {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 .back-btn {
   color: #94a3b8;
   padding: 8px;
@@ -1394,7 +1157,6 @@ function toTimelinePx(timeMs: number): number {
   padding: 12px;
   overflow-y: auto;
   min-height: 0;
-  transition: width 0.3s cubic-bezier(0.25, 1, 0.5, 1), padding 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 .sidebar-section {
@@ -1544,48 +1306,6 @@ function toTimelinePx(timeMs: number): number {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-}
-
-.color-picker-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.color-input {
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  background: transparent;
-  cursor: pointer;
-}
-
-.color-preview {
-  font-family: monospace;
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #e2e8f0;
-}
-
-.checkbox-label input[type="checkbox"] {
-  accent-color: #38bdf8;
-}
-
-.form-hint {
-  display: block;
-  font-size: 11px;
-  color: #64748b;
-  margin-top: 4px;
 }
 
 .choice-editor-list {
@@ -1915,40 +1635,6 @@ function toTimelinePx(timeMs: number): number {
   border-radius: 24px;
   padding: 28px;
   box-shadow: 0 30px 80px rgba(15, 23, 42, 0.55);
-  animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(8px);
-  }
-}
-
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.modal-close {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 10px;
-  color: #94a3b8;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.modal-close:hover {
-  background: rgba(148, 163, 184, 0.08);
-  color: #f8fafc;
 }
 
 .modal h2 {
@@ -2015,23 +1701,6 @@ function toTimelinePx(timeMs: number): number {
   justify-items: center;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.25s ease, background 0.25s ease;
-}
-
-.upload-area:hover {
-  border-color: #5b8dd6;
-  background: linear-gradient(180deg, rgba(59, 130, 246, 0.14), rgba(15, 23, 42, 0.5));
-}
-
-.upload-area.drag-over {
-  border-color: #38bdf8;
-  background: linear-gradient(180deg, rgba(56, 189, 248, 0.16), rgba(15, 23, 42, 0.6));
-  animation: pulse-border 1s ease-in-out infinite;
-}
-
-@keyframes pulse-border {
-  0%, 100% { border-color: #38bdf8; }
-  50% { border-color: #7dd3fc; }
 }
 
 .upload-area svg {
@@ -2096,35 +1765,5 @@ function toTimelinePx(timeMs: number): number {
   .header-actions {
     justify-content: flex-start;
   }
-}
-
-.publish-status-badge {
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.publish-status-badge.published {
-  background: rgba(16, 185, 129, 0.18);
-  color: #6ee7b7;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.publish-status-badge.draft {
-  background: rgba(148, 163, 184, 0.08);
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.15);
-}
-
-.btn-publish {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: #00201a;
-}
-
-.btn-publish:hover {
-  filter: brightness(1.1);
 }
 </style>

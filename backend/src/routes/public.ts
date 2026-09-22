@@ -77,10 +77,6 @@ function serializePublicEdge(edge: Record<string, any>) {
     source_handle: edge.source_handle,
     target_handle: edge.target_handle,
     display_order: edge.display_order,
-    choice_color: edge.choice_color,
-    set_variable: edge.set_variable,
-    require_variable: edge.require_variable,
-    return_to_source: edge.return_to_source,
   };
 }
 

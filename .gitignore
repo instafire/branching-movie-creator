@@ -18,10 +18,14 @@ build/
 *.log
 *.err
 *.out
+*.err.txt
+*.out.txt
+winsock-catalog.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+release/
 
 # Storage and uploads
 backend/storage/*

@@ -74,10 +74,6 @@ function handlePlaybackError(error: Error) {
   width: 100vw;
   height: 100dvh;
   overflow: hidden;
-  touch-action: none;
-  overscroll-behavior: none;
-  -webkit-user-select: none;
-  user-select: none;
   background:
     radial-gradient(circle at top, rgba(255, 60, 92, 0.16), transparent 30%),
     radial-gradient(circle at bottom, rgba(34, 197, 94, 0.12), transparent 24%),
@@ -100,12 +96,5 @@ function handlePlaybackError(error: Error) {
 
 .movie-error {
   color: #fecaca;
-}
-
-@media (max-width: 640px) {
-  .movie-status {
-    font-size: 0.85rem;
-    padding: 16px;
-  }
 }
 </style>

@@ -3,12 +3,6 @@ import { computed, ref } from 'vue';
 
 import type { Edge, Node } from './graphStore';
 
-interface HistoryEntry {
-  nodeId: string;
-  timeMs: number;
-  remainingChoices: Edge[];
-}
-
 export const usePlayerStore = defineStore('player', () => {
   const currentNode = ref<Node | null>(null);
   const mediaTimeMs = ref(0);
@@ -19,8 +13,6 @@ export const usePlayerStore = defineStore('player', () => {
   const isEnded = ref(false);
   const isBuffering = ref(false);
   const availableChoices = ref<Edge[]>([]);
-  const gameState = ref<Record<string, boolean>>({});
-  const historyStack = ref<HistoryEntry[]>([]);
 
   const currentTimeSeconds = computed(() => currentTimeMs.value / 1000);
 
@@ -47,11 +39,6 @@ export const usePlayerStore = defineStore('player', () => {
   );
 
   const canShowChoices = computed(() => promptChoices.value.length > 0);
-
-  function isChoiceLocked(edge: Edge): boolean {
-    if (!edge.require_variable) return false;
-    return !gameState.value[edge.require_variable];
-  }
 
   function setCurrentNode(node: Node | null) {
     currentNode.value = node;
@@ -107,24 +94,8 @@ export const usePlayerStore = defineStore('player', () => {
     isBuffering.value = buffering;
   }
 
-  function selectChoice(edge: Edge): string | null {
-    if (isChoiceLocked(edge)) return null;
-    if (edge.set_variable) {
-      gameState.value[edge.set_variable] = true;
-    }
+  function selectChoice(edge: Edge) {
     return edge.target_node_id;
-  }
-
-  function pushReturnPoint(nodeId: string, timeMs: number, remainingChoices: Edge[]) {
-    historyStack.value.push({ nodeId, timeMs, remainingChoices });
-  }
-
-  function popReturnPoint(): HistoryEntry | null {
-    return historyStack.value.pop() ?? null;
-  }
-
-  function hasReturnPoint(): boolean {
-    return historyStack.value.length > 0;
   }
 
   function reset() {
@@ -137,8 +108,6 @@ export const usePlayerStore = defineStore('player', () => {
     isEnded.value = false;
     isBuffering.value = false;
     availableChoices.value = [];
-    gameState.value = {};
-    historyStack.value = [];
   }
 
   return {
@@ -151,14 +120,11 @@ export const usePlayerStore = defineStore('player', () => {
     isEnded,
     isBuffering,
     availableChoices,
-    gameState,
-    historyStack,
     currentTimeSeconds,
     visibleChoices,
     promptChoices,
     hasActiveChoices,
     canShowChoices,
-    isChoiceLocked,
     setCurrentNode,
     setDuration,
     setAvailableChoices,
@@ -167,9 +133,6 @@ export const usePlayerStore = defineStore('player', () => {
     setEnded,
     setBuffering,
     selectChoice,
-    pushReturnPoint,
-    popReturnPoint,
-    hasReturnPoint,
     reset,
   };
 });

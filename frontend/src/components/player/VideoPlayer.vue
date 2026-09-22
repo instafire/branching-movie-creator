@@ -8,7 +8,6 @@
       ref="videoElement"
       class="video-element"
       :style="feedVideoStyle"
-      :muted="isMuted"
       preload="auto"
       playsinline
       @timeupdate="handleTimeUpdate"
@@ -17,13 +16,6 @@
       @waiting="handleWaiting"
       @playing="handlePlaying"
       @pause="handlePause"
-    />
-
-    <audio
-      ref="bgMusicElement"
-      :src="bgMusicUrl"
-      loop
-      preload="auto"
     />
 
     <div v-if="isBuffering" class="loading-overlay">
@@ -88,7 +80,6 @@ const playerStore = usePlayerStore()
 
 const playerContainer = ref<HTMLDivElement | null>(null)
 const videoElement = ref<HTMLVideoElement | null>(null)
-const bgMusicElement = ref<HTMLAudioElement | null>(null)
 
 const currentNode = computed(() => playerStore.currentNode)
 const currentTimeMs = computed(() => playerStore.currentTimeMs)
@@ -108,15 +99,6 @@ const feedVideoStyle = computed(() => {
     return undefined
   }
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 640
-
-  if (isMobile) {
-    return {
-      width: '100vw',
-      maxHeight: '100dvh',
-    }
-  }
-
   return videoAspectRatio.value < 1
     ? {
         width: 'min(82vw, 430px)',
@@ -133,9 +115,6 @@ const promptChoicesWithTargets = computed(() =>
     target_node: props.nodes.find((node) => node.id === edge.target_node_id) ?? edge.target_node,
   }))
 )
-
-const isMuted = computed(() => currentNode.value?.mute_audio ?? false)
-const bgMusicUrl = computed(() => currentNode.value?.bg_music_url ?? undefined)
 
 function getInitialNode() {
   return (props.startNodeId
@@ -232,10 +211,6 @@ async function startPlayback() {
 
   try {
     await video.play()
-    if (bgMusicElement.value && bgMusicUrl.value) {
-      bgMusicElement.value.currentTime = 0
-      bgMusicElement.value.play().catch(console.error)
-    }
     autoplayBlocked.value = false
     playerStore.setPlaying(true)
   } catch (error) {
@@ -249,7 +224,7 @@ async function startPlayback() {
   }
 }
 
-async function goToNode(node: Node, resumeTimeMs?: number) {
+async function goToNode(node: Node) {
   const video = videoElement.value
 
   if (!video) {
@@ -290,9 +265,8 @@ async function goToNode(node: Node, resumeTimeMs?: number) {
 
     await loadVideoSource(video, sourceUrl)
 
-    const timeToStart = resumeTimeMs ?? node.start_time_ms
-    video.currentTime = timeToStart / 1000
-    playerStore.updateTime(timeToStart)
+    video.currentTime = node.start_time_ms / 1000
+    playerStore.updateTime(node.start_time_ms)
     await startPlayback()
   } catch (error) {
     playerStore.setBuffering(false)
@@ -319,17 +293,6 @@ function finalizeCurrentNode() {
     return
   }
 
-  if (playerStore.hasReturnPoint()) {
-    const returnEntry = playerStore.popReturnPoint()
-    if (returnEntry) {
-      const returnNode = props.nodes.find((n) => n.id === returnEntry.nodeId)
-      if (returnNode) {
-        goToNode(returnNode, returnEntry.timeMs)
-        return
-      }
-    }
-  }
-
   playerStore.setEnded()
 
   if (availableChoices.value.length === 0) {
@@ -349,18 +312,8 @@ function handleTimeUpdate() {
 
   if (absoluteEndTime && absoluteMediaTime >= absoluteEndTime && !playerStore.isEnded) {
     videoElement.value.pause()
-    if (bgMusicElement.value) {
-      bgMusicElement.value.pause()
-    }
     videoElement.value.currentTime = absoluteEndTime / 1000
     playerStore.updateTime(absoluteEndTime)
-    
-    if (currentNode.value.is_event_clip) {
-      seek(0)
-      play()
-      return
-    }
-
     finalizeCurrentNode()
   }
 }
@@ -407,9 +360,6 @@ function handlePause() {
 async function play() {
   try {
     await videoElement.value?.play()
-    if (bgMusicElement.value && bgMusicUrl.value) {
-      bgMusicElement.value.play().catch(console.error)
-    }
     playerStore.setPlaying(true)
   } catch (error) {
     emit('error', error as Error)
@@ -418,9 +368,6 @@ async function play() {
 
 function pause() {
   videoElement.value?.pause()
-  if (bgMusicElement.value) {
-    bgMusicElement.value.pause()
-  }
   autoplayBlocked.value = false
   playerStore.setPlaying(false)
 }
@@ -435,22 +382,9 @@ function seek(timeMs: number) {
 }
 
 async function handleChoiceSelect(edge: Edge) {
-  const targetNodeId = playerStore.selectChoice(edge)
-  if (!targetNodeId) return
-
-  const targetNode = props.nodes.find((node) => node.id === targetNodeId)
+  const targetNode = props.nodes.find((node) => node.id === edge.target_node_id)
 
   if (targetNode) {
-    if (edge.return_to_source && currentNode.value) {
-      const returnTimeMs = currentNode.value.is_event_clip 
-        ? currentNode.value.start_time_ms 
-        : playerStore.mediaTimeMs
-      playerStore.pushReturnPoint(
-        currentNode.value.id,
-        returnTimeMs,
-        [...playerStore.availableChoices]
-      )
-    }
     await goToNode(targetNode)
   }
 }
@@ -528,24 +462,6 @@ onUnmounted(() => {
   border-radius: 28px;
   border: 1px solid rgba(148, 163, 184, 0.12);
   box-shadow: 0 26px 70px rgba(2, 6, 23, 0.5);
-}
-
-@media (max-width: 640px) {
-  .video-player-feed .video-element {
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-  }
-
-  .resume-button {
-    padding: 16px 28px;
-    font-size: 17px;
-  }
-
-  .loading-spinner {
-    width: 40px;
-    height: 40px;
-  }
 }
 
 .loading-overlay {
