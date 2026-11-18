@@ -106,7 +106,13 @@ router.get('/me', authMiddleware, async (req: AuthRequest, res: Response, next: 
       throw new AppError(404, 'User not found');
     }
 
-    res.json(user);
+    res.json({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatar_url: user.avatar_url,
+      created_at: user.created_at,
+    });
   } catch (error) {
     next(error);
   }
